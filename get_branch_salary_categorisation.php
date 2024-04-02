@@ -4,6 +4,7 @@ require_once('./database/connect.php');
 header('Access-Control-Allow-Origin: http://localhost:3000');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 
 session_start(); // Start the session
@@ -42,7 +43,6 @@ try {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $data = [
-        'Specialization' => $specialization,
         'Less than 5 lakhs' => (int)$row['Less than 5 lakhs'],
         '5 lakhs to 9.99 lakhs' => (int)$row['5 lakhs to 9.99 lakhs'],
         '10 lakhs to 14.99 lakhs' => (int)$row['10 lakhs to 14.99 lakhs'],

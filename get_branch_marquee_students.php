@@ -4,10 +4,20 @@ require_once('./database/connect.php');
 header('Access-Control-Allow-Origin: http://localhost:3000');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 
 
 // Check if the user is logged in and get the user ID from the session
+
+session_start(); // Start the session
+
+// Check if the user is logged in and get the user ID from the session
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
+    exit;
+}
+
 
 $user_id = $_SESSION['user_id'];
 

@@ -36,6 +36,15 @@ if (isset($_SESSION['user_id'])) {
         foreach ($facultyAdvisors as $advisor) {
             $facultyAdvisorName = $advisor['facultyAdvisorName'];
 
+            $stmtFacultyAdvisorSection = $conn->query("SELECT section FROM users WHERE name = '$facultyAdvisorName'");
+            $facultyAdvisorSection = $stmtFacultyAdvisorSection->fetch(PDO::FETCH_ASSOC)['section'];
+
+            // Count for total students
+            $stmtTotalCount = $conn->prepare("SELECT COUNT(*) as totalStudents FROM students WHERE facultyAdvisorName = ?");
+            $stmtTotalCount->execute([$facultyAdvisorName]);
+            $totalCount = $stmtTotalCount->fetch(PDO::FETCH_ASSOC)['totalStudents'];
+
+
             // Count for Superset Enrolled
             $stmtSupersetCount = $conn->prepare("SELECT COUNT(*) as supersetEnrolledCount FROM students WHERE facultyAdvisorName = ? AND careerOption = 'Superset Enrolled'");
             $stmtSupersetCount->execute([$facultyAdvisorName]);
@@ -62,7 +71,9 @@ if (isset($_SESSION['user_id'])) {
             // Consolidated report for this faculty advisor
             $consolidatedReport[] = [
                 'facultyAdvisorName' => $facultyAdvisorName,
+                'facultyAdvisorSection' => $facultyAdvisorSection, // Directly assign the section value
                 'supersetEnrolledCount' => $supersetCount,
+                'totalCount' => $totalCount,
                 'marquee' => $categoryCounts['marquee'],
                 'superDream' => $categoryCounts['super dream'],
                 'dream' => $categoryCounts['dream'],
