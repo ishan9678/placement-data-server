@@ -25,11 +25,29 @@ if (isset($_SESSION['user_id'])) {
         }
 
         // Check if a faculty advisor name is provided as a query parameter
-        $facultyAdvisor = isset($_GET['advisor']) ? $_GET['advisor'] : $user['name'];
+        $facultyAdvisor = isset($_GET['advisor']) ? $_GET['advisor'] : null;
 
-        // Fetch placed students for the specified faculty advisor
-        $stmtStudents = $conn->prepare("SELECT * FROM placed_students WHERE facultyAdvisor = ?");
-        $stmtStudents->execute([$facultyAdvisor]);
+        // Check if a company name is provided as a query parameter
+        $companyName = isset($_GET['company']) ? $_GET['company'] : null;
+
+        // Construct the SQL query
+        $sql = "SELECT * FROM placed_students WHERE 1";
+
+        // If a faculty advisor name is provided, add it to the query
+        if ($facultyAdvisor !== null) {
+            $sql .= " AND facultyAdvisor = ?";
+            $params[] = $facultyAdvisor;
+        }
+
+        // If a company name is provided, add it to the query
+        if ($companyName !== null) {
+            $sql .= " AND companyName = ?";
+            $params[] = $companyName;
+        }
+
+        // Fetch placed students based on the constructed query
+        $stmtStudents = $conn->prepare($sql);
+        $stmtStudents->execute($params);
         $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode(array('status' => 'success', 'facultyAdvisorName' => $facultyAdvisor, 'students' => $students));

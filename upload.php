@@ -16,7 +16,7 @@ if (isset($_FILES['file'])) {
         echo "The file " . htmlspecialchars(basename($_FILES["file"]["name"])) . " has been uploaded.";
 
         // Prepare an SQL query to insert the file path into the database
-        $stmt = $conn->prepare("UPDATE students SET file=:file WHERE registerNumber=:registerNumber");
+        $stmt = $conn->prepare("UPDATE placed_students SET file=:file WHERE registerNumber=:registerNumber");
         $stmt->bindParam(':file', $target_file);
         $stmt->bindParam(':registerNumber', $_POST['registerNumber']);
 
