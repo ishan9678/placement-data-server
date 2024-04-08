@@ -13,6 +13,8 @@ header('Content-Type: application/json');
 if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
 
+    $params = array();
+
     try {
         // Fetch the name of the faculty advisor
         $stmtUser = $conn->prepare("SELECT name FROM users WHERE id = ?");

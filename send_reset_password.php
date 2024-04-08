@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->addAddress($email);
             $mail->Subject = "Password Reset";
             $mail->Body = <<<END
-            Click <a href="http://localhost:3000/reset-password?token=$token">here</a> to reset your password.
+            Click <a href="https://placementdata.in/reset-password?token=$token">here</a> to reset your password.
         END;
 
             try {
