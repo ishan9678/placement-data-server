@@ -3,7 +3,7 @@ require_once('./database/connect.php');
 
 session_start();
 
-header('Access-Control-Allow-Origin: http://localhost:3000, https://placementdata.in/');
+header('Access-Control-Allow-Origin: http://localhost:3000');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
@@ -29,7 +29,7 @@ if (isset($_SESSION['user_id'])) {
         $facultyAdvisors = $stmtFacultyAdvisors->fetchAll(PDO::FETCH_ASSOC);
 
         // Categories to include in the report
-        $categories = ['marquee', 'super dream', 'dream', 'day sharing', 'internship'];
+        $categories = ['Marquee', 'Super Dream', 'Dream', 'Day Sharing', 'Internship'];
 
         // Array to store consolidated report
         $consolidatedReport = [];
@@ -65,7 +65,7 @@ if (isset($_SESSION['user_id'])) {
 
             // Calculate total offers
             // Calculate total offers
-            $totalOffers = (int)$categoryCounts['marquee'] + (int)$categoryCounts['super dream'] + (int)$categoryCounts['dream'] + (int)$categoryCounts['day sharing'] + (int)$categoryCounts['internship'];
+            $totalOffers = (int)$categoryCounts['Marquee'] + (int)$categoryCounts['Super Dream'] + (int)$categoryCounts['Dream'] + (int)$categoryCounts['Day Sharing'] + (int)$categoryCounts['Internship'];
 
 
 
@@ -75,11 +75,11 @@ if (isset($_SESSION['user_id'])) {
                 'facultyAdvisorSection' => $facultyAdvisorSection, // Directly assign the section value
                 'supersetEnrolledCount' => $supersetCount,
                 'totalCount' => $totalCount,
-                'marquee' => $categoryCounts['marquee'],
-                'superDream' => $categoryCounts['super dream'],
-                'dream' => $categoryCounts['dream'],
-                'daySharing' => $categoryCounts['day sharing'],
-                'internship' => $categoryCounts['internship'],
+                'marquee' => $categoryCounts['Marquee'],
+                'superDream' => $categoryCounts['Super Dream'],
+                'dream' => $categoryCounts['Dream'],
+                'daySharing' => $categoryCounts['Day Sharing'],
+                'internship' => $categoryCounts['Internship'],
                 'totalOffers' => $totalOffers,
             ];
         }

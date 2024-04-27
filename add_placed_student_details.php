@@ -1,7 +1,7 @@
 <?php
-require_once('./database/connect.php'); // Adjust the path based on your file structure
+require_once('./database/connect.php');
 
-header('Access-Control-Allow-Origin: http://localhost:3000, https://placementdata.in/');
+header('Access-Control-Allow-Origin: http://localhost:3000');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
@@ -23,6 +23,8 @@ if (is_array($data)) {
             $package = $student['package'];
             $facultyAdvisorName = $student['facultyAdvisorName'];
             $batch = $student['batch'];
+            $specialization = $student['specialization'];
+
 
             // Check if the student exists in the students table
             $checkStudentQuery = $conn->prepare("SELECT * FROM students WHERE registerNumber = ?");
@@ -32,14 +34,12 @@ if (is_array($data)) {
             // If the student doesn't exist, add them to the students table
             if (!$existingStudent) {
                 $insertStudentQuery = $conn->prepare("INSERT INTO students (registerNumber, name, section, batch, specialization, careerOption, facultyAdvisorName) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                // If specialization is empty, set it to an empty string
-                $specialization = isset($student['specialization']) ? $student['specialization'] : '';
                 $insertStudentQuery->execute([$registerNumber, $fullName, $section, $batch, $specialization, 'Superset Enrolled', $facultyAdvisorName]);
             }
 
             // Insert placed student details into the placed_students table
-            $insertQuery = $conn->prepare("INSERT INTO placed_students (registerNumber, fullName, section, companyName, category, package, facultyAdvisor, batch) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $insertQuery->execute([$registerNumber, $fullName, $section, $companyName, $category, $package, $facultyAdvisorName, $batch]);
+            $insertQuery = $conn->prepare("INSERT INTO placed_students (registerNumber, fullName, section, companyName, category, package, facultyAdvisor, batch, specialization) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $insertQuery->execute([$registerNumber, $fullName, $section, $companyName, $category, $package, $facultyAdvisorName, $batch, $specialization]);
         }
 
         echo json_encode(array('status' => 'success', 'message' => 'Placed student details added successfully'));
