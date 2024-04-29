@@ -32,7 +32,10 @@ $query = "SELECT
     SUM(CASE WHEN package > 40 THEN 1 ELSE 0 END) AS 'Greater than 40 lakhs',
     COUNT(*) AS 'TOTAL'
 FROM placed_students
-WHERE facultyAdvisor = :fa_name";
+WHERE facultyAdvisor = :fa_name
+    AND package > 0
+    AND category != 'Internship'";
+
 
 try {
     $stmt = $conn->prepare($query);

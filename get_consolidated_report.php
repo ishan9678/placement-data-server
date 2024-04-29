@@ -7,7 +7,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
 try {
-    $batch = isset($_GET['batch']) ? $_GET['batch'] : 2025;
+    $batch = isset($_GET['batch']) ? $_GET['batch'] : '';
 
     $stmtFacultyAdvisors = $conn->query("SELECT DISTINCT facultyAdvisorName FROM students where batch = '$batch' ");
     $facultyAdvisors = $stmtFacultyAdvisors->fetchAll(PDO::FETCH_ASSOC);
@@ -52,6 +52,12 @@ try {
         // Calculate total offers
         $totalOffers = (int)$categoryCounts['Marquee'] + (int)$categoryCounts['Super Dream'] + (int)$categoryCounts['Dream'] + (int)$categoryCounts['Day Sharing'] + (int)$categoryCounts['Internship'];
 
+        $uniqueCount = 0;
+
+        $stmtUniqueCount = $conn->prepare("SELECT COUNT(DISTINCT registerNumber) AS unique_registerNumber_count FROM placed_students WHERE facultyAdvisor = ?");
+        $stmtUniqueCount->execute([$facultyAdvisorName]);
+        $uniqueCount += $stmtUniqueCount->fetch(PDO::FETCH_ASSOC)['unique_registerNumber_count'];
+
         // Consolidated report for this faculty advisor
         $consolidatedReport[] = [
             'facultyAdvisorName' => $facultyAdvisorName,
@@ -64,6 +70,7 @@ try {
             'daySharing' => $categoryCounts['Day Sharing'],
             'internship' => $categoryCounts['Internship'],
             'totalOffers' => $totalOffers,
+            'uniqueCount' => $uniqueCount,
         ];
     }
 

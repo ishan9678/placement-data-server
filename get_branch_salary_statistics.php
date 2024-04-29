@@ -37,12 +37,16 @@ if ($stmt_specialization->rowCount() > 0) {
         FROM 
             placed_students
         WHERE 
-            specialization = :specialization and batch = '$batch'
+            specialization = :specialization
+            AND batch = :batch
+            AND package > 0
+            AND category != 'Internship'
     ";
 
     // Prepare and execute the query to get package statistics
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':specialization', $specialization, PDO::PARAM_STR);
+    $stmt->bindParam(':batch', $batch, PDO::PARAM_STR);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -56,9 +60,9 @@ if ($stmt_specialization->rowCount() > 0) {
         FROM 
             placed_students
         WHERE 
-            package = :max_package
-        OR 
-            package = :min_package
+            (package = :max_package OR package = :min_package)
+            AND package > 0
+            AND category != 'Internship'
     ";
 
     $stmt2 = $conn->prepare($query2);

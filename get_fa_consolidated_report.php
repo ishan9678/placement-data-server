@@ -33,6 +33,8 @@ if (isset($_SESSION['user_id'])) {
         // Array to store consolidated report
         $consolidatedReport = [];
 
+        $uniqueCount = 0;
+
         // Count for total students
         $stmtTotalCount = $conn->prepare("SELECT COUNT(*) as totalStudents FROM students WHERE facultyAdvisorName = ?");
         $stmtTotalCount->execute([$facultyAdvisor['facultyAdvisorName']]);
@@ -58,6 +60,11 @@ if (isset($_SESSION['user_id'])) {
         // Calculate total offers
         $totalOffers = (int)$categoryCounts['Marquee'] + (int)$categoryCounts['Super Dream'] + (int)$categoryCounts['Dream'] + (int)$categoryCounts['Day Sharing'] + (int)$categoryCounts['Internship'];
 
+        $stmtUniqueCount = $conn->prepare("SELECT COUNT(DISTINCT registerNumber) AS unique_registerNumber_count FROM placed_students WHERE facultyAdvisor = ?");
+        $stmtUniqueCount->execute([$facultyAdvisor['facultyAdvisorName']]); // Corrected parameter
+        $uniqueCount = $stmtUniqueCount->fetch(PDO::FETCH_ASSOC)['unique_registerNumber_count'];
+
+
         // Consolidated report for this faculty advisor
         $consolidatedReport[] = [
             'facultyAdvisorName' => $facultyAdvisor['facultyAdvisorName'],
@@ -70,6 +77,7 @@ if (isset($_SESSION['user_id'])) {
             'daySharing' => $categoryCounts['Day Sharing'],
             'internship' => $categoryCounts['Internship'],
             'totalOffers' => $totalOffers,
+            'uniqueCount' => $uniqueCount,
         ];
 
         // Return the consolidated report

@@ -33,7 +33,9 @@ if ($stmt_fa_name->rowCount() > 0) {
         FROM 
             placed_students
         WHERE 
-        facultyAdvisor = :fa_name
+            facultyAdvisor = :fa_name
+            AND package > 0
+            AND category != 'Internship'
     ";
 
     // Prepare and execute the query to get package statistics
@@ -52,9 +54,9 @@ if ($stmt_fa_name->rowCount() > 0) {
         FROM 
             placed_students
         WHERE 
-            package = :max_package
-        OR 
-            package = :min_package
+            (package = :max_package OR package = :min_package)
+            AND package > 0
+            AND category != 'Internship'
     ";
 
     $stmt2 = $conn->prepare($query2);
