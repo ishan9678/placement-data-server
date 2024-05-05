@@ -3,7 +3,7 @@ require_once('./database/connect.php');
 
 session_start();
 
-header('Access-Control-Allow-Origin: http://localhost:3000');
+header('Access-Control-Allow-Origin: http://localhost:3000, https://placementdata.in/');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
@@ -25,8 +25,8 @@ if (isset($_SESSION['user_id'])) {
         }
 
         // Fetch faculty advisors with the same specialization
-        $stmtAdvisors = $conn->prepare("SELECT id, name FROM users WHERE role = ? AND specialization = ?");
-        $stmtAdvisors->execute(['Faculty Advisor', $user['specialization']]);
+        $stmtAdvisors = $conn->prepare("SELECT id, name FROM users WHERE role = ? AND (specialization = ? OR additional_specialization = ?)");
+        $stmtAdvisors->execute(['Faculty Advisor', $user['specialization'], $user['specialization']]);
         $facultyAdvisors = $stmtAdvisors->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode(array('status' => 'success', 'facultyAdvisors' => $facultyAdvisors));
