@@ -7,7 +7,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 
-$batch = isset($_GET['batch']) ? $_GET['batch'] : 2025;
+$batch = isset($_GET['batch']) ? $_GET['batch'] : "";
 
 $query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE category = 'marquee' and batch = '$batch' ";
 $stmt = $conn->prepare($query);

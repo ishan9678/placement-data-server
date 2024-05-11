@@ -50,7 +50,7 @@ $data = array(
     'Number of Students opted for Higher Studies' => $higherStudies,
     'Number of Students opted for Entrepreneurship' => $entrepreneurship,
     'Number of Students not eligible for Placement due to Arrears' => $arrears,
-    'Number of Not Eligible Students for Placements' => $notEligible,
+    'Number of Students not opted for Placements' => $notEligible,
     'Total Number of Students' => $totalStudents,
 );
 

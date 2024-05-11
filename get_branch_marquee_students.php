@@ -33,7 +33,7 @@ if ($stmt->rowCount() > 0) {
     $specialization = $stmt->fetchColumn();
 
     // Select the marquee students based on the specialization
-    $query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE specialization = :specialization and batch = '$batch' ";
+    $query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE specialization = :specialization and batch = '$batch' and category = 'Marquee' ";
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':specialization', $specialization, PDO::PARAM_STR);
     $stmt->execute();

@@ -29,7 +29,7 @@ if (!$facultyAdvisor) {
 $facultyAdvisorName = $facultyAdvisor['facultyAdvisorName'];
 
 // Select the marquee students for the faculty advisor
-$query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE facultyAdvisor = ?";
+$query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE facultyAdvisor = ? and where category = 'Marquee' ";
 $stmt = $conn->prepare($query);
 $stmt->bindParam(1, $facultyAdvisorName, PDO::PARAM_STR);
 $stmt->execute();
