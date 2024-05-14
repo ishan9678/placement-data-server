@@ -3,7 +3,7 @@ require_once('./database/connect.php');
 
 session_start();
 
-header('Access-Control-Allow-Origin: http://localhost:3000, https://placementdata.in/');
+header('Access-Control-Allow-Origin: http://localhost:3000, https://placementdata.in');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
@@ -22,7 +22,6 @@ if (isset($_SESSION['user_id'])) {
             exit;
         }
 
-
         // Fetch faculty advisor names from the same specialization
         $stmtFacultyAdvisors = $conn->prepare("SELECT DISTINCT name as facultyAdvisorName FROM users WHERE role = 'Faculty Advisor' AND (specialization = ? OR additional_specialization = ?) and batch = ?");
         $stmtFacultyAdvisors->execute([$user['specialization'], $user['specialization'], $batch]);
@@ -34,32 +33,33 @@ if (isset($_SESSION['user_id'])) {
         // Array to store consolidated report
         $consolidatedReport = [];
 
-        $uniqueCount = 0;
-
+        $uniqueCount = 0; // Initialize outside the loop
 
         foreach ($facultyAdvisors as $advisor) {
             $facultyAdvisorName = $advisor['facultyAdvisorName'];
+            $specialization = $user['specialization'];
 
-            $stmtFacultyAdvisorSection = $conn->query("SELECT section FROM users WHERE name = '$facultyAdvisorName'");
+            $stmtFacultyAdvisorSection = $conn->prepare("SELECT section FROM users WHERE name = ?");
+            $stmtFacultyAdvisorSection->execute([$facultyAdvisorName]);
             $facultyAdvisorSection = $stmtFacultyAdvisorSection->fetch(PDO::FETCH_ASSOC)['section'];
 
             // Count for total students
-            $stmtTotalCount = $conn->prepare("SELECT COUNT(*) as totalStudents FROM students WHERE facultyAdvisorName = ? and specialization = ?");
-            $stmtTotalCount->execute([$facultyAdvisorName, $user['specialization']]);
+            $stmtTotalCount = $conn->prepare("SELECT COUNT(*) as totalStudents FROM students WHERE facultyAdvisorName = ? AND specialization = ?");
+            $stmtTotalCount->execute([$facultyAdvisorName, $specialization]);
             $totalCount = $stmtTotalCount->fetch(PDO::FETCH_ASSOC)['totalStudents'];
 
             // Count for Superset Enrolled
             $stmtSupersetCount = $conn->prepare("SELECT COUNT(*) as supersetEnrolledCount FROM students WHERE facultyAdvisorName = ? AND careerOption = 'Superset Enrolled' and specialization = ?");
-            $stmtSupersetCount->execute([$facultyAdvisorName, $user['specialization']]);
+            $stmtSupersetCount->execute([$facultyAdvisorName, $specialization]);
             $supersetCount = $stmtSupersetCount->fetch(PDO::FETCH_ASSOC)['supersetEnrolledCount'];
 
             // Count for each category
             $categoryCounts = [];
 
             foreach ($categories as $category) {
-                $stmtCategoryCounts = $conn->prepare("SELECT category, COUNT(*) as categoryCount FROM placed_students WHERE facultyAdvisor = ? AND specialization = ? GROUP BY category");
-                $stmtCategoryCounts->execute([$facultyAdvisorName, $user['specialization']]);
-                $categoryCounts = $stmtCategoryCounts->fetchAll(PDO::FETCH_ASSOC);
+                $stmtCategoryCounts = $conn->prepare("SELECT category, COUNT(*) as categoryCount FROM placed_students WHERE facultyAdvisor = ? AND specialization = ? AND category = ?");
+                $stmtCategoryCounts->execute([$facultyAdvisorName, $specialization, $category]);
+                $categoryCount = $stmtCategoryCounts->fetch(PDO::FETCH_ASSOC)['categoryCount'];
 
                 // Store the category count
                 $categoryCounts[$category] = $categoryCount;
@@ -68,12 +68,11 @@ if (isset($_SESSION['user_id'])) {
             // Calculate total offers
             $totalOffers = (int)$categoryCounts['Marquee'] + (int)$categoryCounts['Super Dream'] + (int)$categoryCounts['Dream'] + (int)$categoryCounts['Day Sharing'] + (int)$categoryCounts['Internship'];
 
-
-            $stmtUniqueCount = $conn->prepare("SELECT COUNT(DISTINCT registerNumber) AS unique_registerNumber_count FROM placed_students WHERE facultyAdvisor = ? and specialization = ?");
-            $stmtUniqueCount->execute([$facultyAdvisorName, $user['specialization']]);
+            $uniqueCount = 0;
+            // fetch unique count
+            $stmtUniqueCount = $conn->prepare("SELECT COUNT(DISTINCT registerNumber) AS unique_registerNumber_count FROM placed_students WHERE facultyAdvisor = ?");
+            $stmtUniqueCount->execute([$facultyAdvisorName]);
             $uniqueCount += $stmtUniqueCount->fetch(PDO::FETCH_ASSOC)['unique_registerNumber_count'];
-
-
 
             // Consolidated report for this faculty advisor
             $consolidatedReport[] = [
