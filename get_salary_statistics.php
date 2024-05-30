@@ -1,7 +1,6 @@
 <?php
 require_once('./database/connect.php');
 
-header('Access-Control-Allow-Origin: http://localhost:3000, https://placementdata.in/');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
@@ -9,53 +8,81 @@ header('Content-Type: application/json');
 
 $batch = isset($_GET['batch']) ? $_GET['batch'] : 2025;
 
-// Query to get the highest, lowest, and average package values for the specified batch
+// Query to get all relevant package values for the specified batch
 $query = "
-SELECT 
-    MAX(package) AS max_package,
-    MIN(package) AS min_package,
-    ROUND(AVG(package), 2) AS avg_package
-FROM 
-    placed_students
-WHERE
-    batch = :batch
-    AND package > 0
-    AND category != 'Internship'
-";
-
-
-// Prepare and execute the query to get package statistics
-$stmt = $conn->prepare($query);
-$stmt->bindParam(':batch', $batch);
-$stmt->execute();
-$result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// Get the company names for the highest and lowest package values
-$max_package = $result['max_package'];
-$min_package = $result['min_package'];
-
-$query2 = "
     SELECT 
-        companyName
+        package, companyName, fullName
     FROM 
         placed_students
     WHERE 
-        (package = :max_package OR package = :min_package)
-        AND batch = :batch
+        batch = :batch
         AND package > 0
         AND category != 'Internship'
+    ORDER BY package
 ";
 
-$stmt2 = $conn->prepare($query2);
-$stmt2->bindParam(':max_package', $max_package);
-$stmt2->bindParam(':min_package', $min_package);
-$stmt2->bindParam(':batch', $batch);
-$stmt2->execute();
-$companies = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+// Prepare and execute the query
+$stmt = $conn->prepare($query);
+$stmt->bindParam(':batch', $batch);
+$stmt->execute();
+$packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Add company names to the result array
-$result['max_company'] = $companies[0]['companyName'];
-$result['min_company'] = $companies[1]['companyName'];
+if (count($packages) == 0) {
+    echo json_encode(['error' => 'No data available']);
+    exit;
+}
+
+// Calculate the max, min, and median packages
+$package_values = array_column($packages, 'package');
+$max_package = max($package_values);
+$min_package = min($package_values);
+
+// Sort the packages to find the median
+sort($package_values);
+$mid = floor(count($package_values) / 2);
+
+if (count($package_values) % 2 == 0) {
+    $median_package = $package_values[$mid - 1];  // Choosing the lower middle value in case of even number of elements
+} else {
+    $median_package = $package_values[$mid];
+}
+
+// Initialize variables for company names and names
+$max_company = '';
+$min_company = '';
+$median_company = '';
+$max_name = '';
+$min_name = '';
+$median_name = '';
+
+// Find the companies and names associated with max, min, and median values
+foreach ($packages as $package) {
+    if ($package['package'] == $max_package) {
+        $max_company = $package['companyName'];
+        $max_name = $package['fullName'];
+    }
+    if ($package['package'] == $min_package) {
+        $min_company = $package['companyName'];
+        $min_name = $package['fullName'];
+    }
+    if ($package['package'] == $median_package) {
+        $median_company = $package['companyName'];
+        $median_name = $package['fullName'];
+    }
+}
+
+// Prepare the result
+$result = [
+    'max_package' => $max_package,
+    'max_company' => $max_company,
+    'max_name' => $max_name,
+    'min_package' => $min_package,
+    'min_company' => $min_company,
+    'min_name' => $min_name,
+    'median_package' => $median_package,
+    'median_company' => $median_company,
+    'median_name' => $median_name
+];
 
 // Send the result to React in JSON format
 echo json_encode($result);

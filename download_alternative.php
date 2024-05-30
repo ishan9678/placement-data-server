@@ -9,7 +9,7 @@ header('Access-Control-Allow-Credentials: true');
 $registerNumber = $_GET['registerNumber'];
 
 // Fetch the file path from the database
-$stmt = $conn->prepare("SELECT file FROM placed_students WHERE registerNumber = ?");
+$stmt = $conn->prepare("SELECT file FROM students WHERE registerNumber = ?");
 $stmt->execute([$registerNumber]);
 $file = $stmt->fetch(PDO::FETCH_ASSOC);
 

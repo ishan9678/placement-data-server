@@ -12,10 +12,8 @@ header('Content-Type: application/json');
 if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
 
-    $params = array();
-
     try {
-        // Fetch the name of the faculty advisor
+        // Fetch the name of the user (assuming the user could be a faculty advisor)
         $stmtUser = $conn->prepare("SELECT name FROM users WHERE id = ?");
         $stmtUser->execute([$userId]);
         $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
@@ -28,30 +26,21 @@ if (isset($_SESSION['user_id'])) {
         // Check if a faculty advisor name is provided as a query parameter
         $facultyAdvisor = isset($_GET['advisor']) ? $_GET['advisor'] : null;
 
-        // Check if a company name is provided as a query parameter
-        $companyName = isset($_GET['company']) ? $_GET['company'] : null;
+        if ($facultyAdvisor) {
+            // Query students where facultyAdvisorName matches and careerOption is "Higher Studies"
+            $stmtStudents = $conn->prepare("
+                SELECT * FROM students 
+                WHERE facultyAdvisorName = :facultyAdvisor 
+                AND careerOption = 'Higher Studies'
+            ");
+            $stmtStudents->bindParam(':facultyAdvisor', $facultyAdvisor);
+            $stmtStudents->execute();
+            $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 
-        // Construct the SQL query
-        $sql = "SELECT * FROM placed_students WHERE 1";
-
-        // If a faculty advisor name is provided, add it to the query
-        if ($facultyAdvisor !== null) {
-            $sql .= " AND facultyAdvisor = ?";
-            $params[] = $facultyAdvisor;
+            echo json_encode(array('status' => 'success', 'students' => $students));
+        } else {
+            echo json_encode(array('status' => 'error', 'message' => 'Faculty advisor name is required'));
         }
-
-        // If a company name is provided, add it to the query
-        if ($companyName !== null) {
-            $sql .= " AND companyName = ?";
-            $params[] = $companyName;
-        }
-
-        // Fetch placed students based on the constructed query
-        $stmtStudents = $conn->prepare($sql);
-        $stmtStudents->execute($params);
-        $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
-
-        echo json_encode(array('status' => 'success', 'facultyAdvisorName' => $facultyAdvisor, 'students' => $students));
     } catch (PDOException $e) {
         echo json_encode(array('status' => 'error', 'message' => 'Error: ' . $e->getMessage()));
     }

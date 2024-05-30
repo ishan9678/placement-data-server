@@ -1,7 +1,6 @@
 <?php
 require_once('./database/connect.php');
 
-header('Access-Control-Allow-Origin: http://localhost:3000, https://placementdata.in/');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
@@ -23,8 +22,11 @@ try {
         $facultyAdvisorName = $advisor['facultyAdvisorName'];
 
         // Fetch section for the faculty advisor
+
         $stmtFacultyAdvisorSection = $conn->query("SELECT section FROM users WHERE name = '$facultyAdvisorName'  ");
-        $facultyAdvisorSection = $stmtFacultyAdvisorSection->fetch(PDO::FETCH_ASSOC)['section'];
+        $facultyAdvisorSectionResult = $stmtFacultyAdvisorSection->fetch(PDO::FETCH_ASSOC);
+        $facultyAdvisorSection = $facultyAdvisorSectionResult ? $facultyAdvisorSectionResult['section'] : null;
+
 
         // Count for total students
         $stmtTotalCount = $conn->prepare("SELECT COUNT(*) as totalStudents FROM students WHERE facultyAdvisorName = ? ");
