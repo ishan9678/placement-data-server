@@ -6,7 +6,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 
-$batch = isset($_GET['batch']) ? $_GET['batch'] : 2025;
+$batch = isset($_GET['batch']) ? $_GET['batch'] : '';
 
 // Query to get all relevant package values for the specified batch
 $query = "
@@ -36,6 +36,8 @@ if (count($packages) == 0) {
 $package_values = array_column($packages, 'package');
 $max_package = max($package_values);
 $min_package = min($package_values);
+$avg_package = array_sum($package_values) / count($package_values);
+
 
 // Sort the packages to find the median
 sort($package_values);
@@ -81,7 +83,8 @@ $result = [
     'min_name' => $min_name,
     'median_package' => $median_package,
     'median_company' => $median_company,
-    'median_name' => $median_name
+    'median_name' => $median_name,
+    'avg_package' => $avg_package
 ];
 
 // Send the result to React in JSON format
