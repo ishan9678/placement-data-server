@@ -11,10 +11,11 @@ header('Content-Type: application/json');
 // Check if the user is logged in by checking the session variable
 if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
+    $department = isset($_GET['department']) ? $_GET['department'] : "";
 
     try {
         // Fetch faculty advisors from the database
-        $stmtAdvisors = $conn->prepare("SELECT id, name FROM users WHERE role = ?");
+        $stmtAdvisors = $conn->prepare("SELECT id, name FROM users WHERE role = ? and department = '$department'");
         $stmtAdvisors->execute(['Faculty Advisor']);
         $facultyAdvisors = $stmtAdvisors->fetchAll(PDO::FETCH_ASSOC);
 

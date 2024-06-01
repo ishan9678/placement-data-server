@@ -16,6 +16,7 @@ if (isset($data["registerNumber"])) {
     $registerNumber = $data["registerNumber"];
     $name = $data["name"];
     $section = $data["section"];
+    $department = $data["department"];
     $specialization = $data["specialization"];
     $careerOption = $data["careerOption"];
     $facultyAdvisor = $data["facultyAdvisorName"];
@@ -26,11 +27,11 @@ if (isset($data["registerNumber"])) {
 
 
     // Update the student details in the students table
-    $students_sql = "UPDATE students SET name='$name', section='$section', specialization='$specialization', batch='$batch', careerOption='$careerOption', facultyAdvisorName='$facultyAdvisor' WHERE registerNumber='$registerNumber'";
+    $students_sql = "UPDATE students SET name='$name', section='$section', department='$department', specialization='$specialization', batch='$batch', careerOption='$careerOption', facultyAdvisorName='$facultyAdvisor' WHERE registerNumber='$registerNumber'";
 
     // Update or insert into the placed_students table
     if (!empty($companyName) && !empty($category) && !empty($package)) {
-        $placed_students_sql = "UPDATE placed_students SET fullName='$name', section='$section', companyName='$companyName', category='$category', package='$package', facultyAdvisor='$facultyAdvisor', batch='$batch', specialization = '$specialization' WHERE registerNumber = '$registerNumber' ";
+        $placed_students_sql = "UPDATE placed_students SET fullName='$name', section='$section', companyName='$companyName', category='$category', package='$package', facultyAdvisor='$facultyAdvisor', batch='$batch', department='$department', specialization = '$specialization' WHERE registerNumber = '$registerNumber' ";
     }
 
     // $placed_students_sql = "INSERT INTO placed_students (registerNumber, fullName, companyName, category, package, facultyAdvisor, batch, specialization)

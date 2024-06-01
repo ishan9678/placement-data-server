@@ -31,6 +31,8 @@ if (isset($_SESSION['user_id'])) {
         // Check if a company name is provided as a query parameter
         $companyName = isset($_GET['company']) ? $_GET['company'] : null;
 
+        $department = isset($_GET['department']) ? $_GET['department'] : "";
+
         // Construct the SQL query
         $sql = "SELECT * FROM placed_students WHERE 1";
 
@@ -44,6 +46,11 @@ if (isset($_SESSION['user_id'])) {
         if ($companyName !== null) {
             $sql .= " AND companyName = ?";
             $params[] = $companyName;
+        }
+
+        if ($department !== "") {
+            $sql .= " AND department = ?";
+            $params[] = $department;
         }
 
         // Fetch placed students based on the constructed query

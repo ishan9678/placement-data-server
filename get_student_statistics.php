@@ -6,7 +6,8 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 
-$batch = isset($_GET['batch']) ? $_GET['batch'] : 2025;
+$batch = isset($_GET['batch']) ? $_GET['batch'] : '';
+$department = isset($_GET['department']) ? $_GET['department'] : '';
 
 // Initialize variables
 $totalStudents = 0;
@@ -16,7 +17,7 @@ $entrepreneurship = 0;
 $arrears = 0;
 
 // Prepare the SQL query
-$query = "SELECT * FROM students where batch = '$batch' ";
+$query = "SELECT * FROM students where batch = '$batch' and department = '$department'";
 $stmt = $conn->prepare($query);
 $stmt->execute();
 

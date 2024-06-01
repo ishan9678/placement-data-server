@@ -14,12 +14,12 @@ if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
 
     try {
-        $stmt = $conn->prepare("SELECT name, role, specialization, section, batch FROM users WHERE id = ?");
+        $stmt = $conn->prepare("SELECT name, role, department, specialization, section, batch FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            echo json_encode(array('status' => 'success', 'name' => $user['name'], 'role' => $user['role'], 'specialization' => $user['specialization'],  'section' => $user['section'], 'batch' => $user['batch']));
+            echo json_encode(array('status' => 'success', 'name' => $user['name'], 'role' => $user['role'], 'department' => $user['department'], 'specialization' => $user['specialization'],  'section' => $user['section'], 'batch' => $user['batch']));
         } else {
             echo json_encode(array('status' => 'error', 'message' => 'User not found'));
         }

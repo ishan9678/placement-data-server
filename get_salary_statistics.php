@@ -7,6 +7,7 @@ header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 
 $batch = isset($_GET['batch']) ? $_GET['batch'] : '';
+$department = isset($_GET['department']) ? $_GET['department'] : '';
 
 // Query to get all relevant package values for the specified batch
 $query = "
@@ -16,6 +17,7 @@ $query = "
         placed_students
     WHERE 
         batch = :batch
+        AND department = :department
         AND package > 0
         AND category != 'Internship'
     ORDER BY package
@@ -24,6 +26,7 @@ $query = "
 // Prepare and execute the query
 $stmt = $conn->prepare($query);
 $stmt->bindParam(':batch', $batch);
+$stmt->bindParam(':department', $department);
 $stmt->execute();
 $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

@@ -16,18 +16,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     try {
-        $stmt = $conn->prepare("INSERT INTO students (registerNumber, name, section, specialization, batch, careerOption, facultyAdvisorName) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO students (registerNumber, name, section, department, specialization, batch, careerOption, facultyAdvisorName) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
         foreach ($data as $student) {
             $registerNumber = $student["registerNumber"];
             $name = $student["name"];
             $section = $student["section"];
+            $department = $student["department"];
             $specialization = $student["specialization"];
             $batch  = $student["batch"];
             $careerOption  = $student["careerOption"];
             $facultyAdvisorName = $student["facultyAdvisorName"];
 
-            $stmt->execute([$registerNumber, $name, $section, $specialization, $batch, $careerOption, $facultyAdvisorName]);
+            $stmt->execute([$registerNumber, $name, $section, $department, $specialization, $batch, $careerOption, $facultyAdvisorName]);
         }
 
         // Return JSON response for successful insertion

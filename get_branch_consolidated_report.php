@@ -12,6 +12,8 @@ if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
     try {
         $batch = isset($_GET['batch']) ? $_GET['batch'] : "";
+        // $department = isset($_GET['department']) ? $_GET['department'] : "";
+
         $stmtUser = $conn->prepare("SELECT specialization FROM users WHERE id = ?");
         $stmtUser->execute([$userId]);
         $user = $stmtUser->fetch(PDO::FETCH_ASSOC);

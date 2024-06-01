@@ -8,7 +8,9 @@ header('Content-Type: application/json');
 try {
     $batch = isset($_GET['batch']) ? $_GET['batch'] : '';
 
-    $stmtFacultyAdvisors = $conn->query("SELECT DISTINCT facultyAdvisorName FROM students where batch = '$batch' ");
+    $department = isset($_GET['department']) ? $_GET['department'] : '';
+
+    $stmtFacultyAdvisors = $conn->query("SELECT DISTINCT facultyAdvisorName FROM students where batch = '$batch' and department = '$department'");
     $facultyAdvisors = $stmtFacultyAdvisors->fetchAll(PDO::FETCH_ASSOC);
 
     // Categories to include in the report

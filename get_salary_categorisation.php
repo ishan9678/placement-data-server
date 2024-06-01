@@ -7,6 +7,7 @@ header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 
 $batch = isset($_GET['batch']) ? $_GET['batch'] : '';
+$department = isset($_GET['department']) ? $_GET['department'] : '';
 
 $query = "SELECT
     SUM(CASE WHEN package < 5 THEN 1 ELSE 0 END) AS 'Less than 5 lakhs',
@@ -17,7 +18,7 @@ $query = "SELECT
     SUM(CASE WHEN package > 40 THEN 1 ELSE 0 END) AS 'Greater than 40 lakhs',
     COUNT(*) AS 'TOTAL'
 FROM placed_students
-WHERE batch = '$batch' AND package > 0 AND category != 'Internship'
+WHERE batch = '$batch' AND department = '$department' AND package > 0 AND category != 'Internship'
 GROUP BY batch";
 
 

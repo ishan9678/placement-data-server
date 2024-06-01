@@ -13,12 +13,20 @@ if (!isset($_GET['registerNumber'])) {
 }
 
 $registerNumber = $_GET['registerNumber'];
+$department = isset($_GET['department']) ? $_GET['department'] : "";
+
 
 try {
     // Fetch student details from the students table based on the register number
-    $stmt = $conn->prepare("SELECT registerNumber, name, section, specialization, batch,  careerOption, facultyAdvisorName FROM students WHERE registerNumber = ?");
-    $stmt->execute([$registerNumber]);
-    $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($department === "") {
+        $stmt = $conn->prepare("SELECT registerNumber, name, section, department, specialization, batch,  careerOption, facultyAdvisorName FROM students WHERE registerNumber = ?");
+        $stmt->execute([$registerNumber]);
+        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        $stmt = $conn->prepare("SELECT registerNumber, name, section, department, specialization, batch,  careerOption, facultyAdvisorName FROM students WHERE registerNumber = ? AND department = '$department'");
+        $stmt->execute([$registerNumber]);
+        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
     if (!$student) {
         echo json_encode(array('status' => 'error', 'message' => 'Student not found'));

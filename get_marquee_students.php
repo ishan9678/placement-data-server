@@ -7,8 +7,9 @@ header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 
 $batch = isset($_GET['batch']) ? $_GET['batch'] : "";
+$department = isset($_GET['department']) ? $_GET['department'] : "";
 
-$query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE category = 'marquee' and batch = '$batch' ";
+$query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE category = 'marquee' and batch = '$batch' and department = '$department'";
 $stmt = $conn->prepare($query);
 $stmt->execute();
 

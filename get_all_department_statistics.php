@@ -7,6 +7,7 @@ header('Content-Type: application/json');
 
 try {
     $batch = isset($_GET['batch']) ? $_GET['batch'] : '';
+    $department = isset($_GET['department']) ? $_GET['department'] : '';
 
     // Array of specializations
     $specializations = ['AI', 'SWE', 'AI/ML'];
