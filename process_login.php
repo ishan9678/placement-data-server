@@ -19,7 +19,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
-            if ($user['isapproved'] == 1) {
+            if ($user['temp_acc'] == 1) {
+                $current_time = new DateTime();
+                $expiry_time = new DateTime($user['temp_acc_expired_at']);
+                if ($current_time < $expiry_time) {
+                    $_SESSION['user_id'] = $user['id'];
+                    echo json_encode(array('status' => 'success', 'message' => 'Login successful!'));
+                } else {
+                    echo json_encode(array('status' => 'error', 'message' => 'Account validity expired'));
+                }
+            } else if ($user['isapproved'] == 1) {
                 $_SESSION['user_id'] = $user['id'];
                 echo json_encode(array('status' => 'success', 'message' => 'Login successful!'));
             } else {
