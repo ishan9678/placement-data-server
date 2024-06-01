@@ -11,6 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $emailId = $_POST["emailId"];
     $role = $_POST["role"];
     $section = $_POST["section"];
+    $department = $_POST["department"];
     $specialization = $_POST["specialization"];
     $batch = $_POST["batch"];
     $password = password_hash($_POST["password"], PASSWORD_BCRYPT);
@@ -28,24 +29,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Prepare the INSERT statement based on the role
         if ($role == "Faculty Advisor") {
-            $stmtUser = $conn->prepare("INSERT INTO users (name, employee_id, email_id, role, specialization, batch, section, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmtUser = $conn->prepare("INSERT INTO users (name, employee_id, email_id, role, department, specialization, batch, section, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmtUser->bindParam(1, $name);
             $stmtUser->bindParam(2, $employeeId);
             $stmtUser->bindParam(3, $emailId);
             $stmtUser->bindParam(4, $role);
-            $stmtUser->bindParam(5, $specialization);
-            $stmtUser->bindParam(6, $batch);
-            $stmtUser->bindParam(7, $section);
-            $stmtUser->bindParam(8, $password);
+            $stmtUser->bindParam(5, $department);
+            $stmtUser->bindParam(6, $specialization);
+            $stmtUser->bindParam(7, $batch);
+            $stmtUser->bindParam(8, $section);
+            $stmtUser->bindParam(9, $password);
         } else {
-            $stmtUser = $conn->prepare("INSERT INTO users (name, employee_id, email_id, role, specialization, batch, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmtUser = $conn->prepare("INSERT INTO users (name, employee_id, email_id, role, department, specialization, batch, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmtUser->bindParam(1, $name);
             $stmtUser->bindParam(2, $employeeId);
             $stmtUser->bindParam(3, $emailId);
             $stmtUser->bindParam(4, $role);
-            $stmtUser->bindParam(5, $specialization);
-            $stmtUser->bindParam(6, $batch);
-            $stmtUser->bindParam(7, $password);
+            $stmtUser->bindParam(5, $department);
+            $stmtUser->bindParam(6, $specialization);
+            $stmtUser->bindParam(7, $batch);
+            $stmtUser->bindParam(8, $password);
         }
 
         $stmtUser->execute();
