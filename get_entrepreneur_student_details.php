@@ -26,7 +26,10 @@ if (isset($_SESSION['user_id'])) {
         // Check if a faculty advisor name is provided as a query parameter
         $facultyAdvisor = isset($_GET['advisor']) ? $_GET['advisor'] : null;
 
-        if ($facultyAdvisor) {
+        $department = isset($_GET['department']) ? $_GET['department'] : null;
+
+
+        if ($facultyAdvisor && $department == null) {
             // Query students where facultyAdvisorName matches and careerOption is "Higher Studies"
             $stmtStudents = $conn->prepare("
                 SELECT * FROM students 
@@ -34,6 +37,20 @@ if (isset($_SESSION['user_id'])) {
                 AND careerOption = 'Entrepreneur'
             ");
             $stmtStudents->bindParam(':facultyAdvisor', $facultyAdvisor);
+            $stmtStudents->execute();
+            $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode(array('status' => 'success', 'students' => $students));
+        } else if ($facultyAdvisor && $department) {
+            // Query students where facultyAdvisorName matches and careerOption is "Higher Studies" and department matches
+            $stmtStudents = $conn->prepare("
+                SELECT * FROM students 
+                WHERE facultyAdvisorName = :facultyAdvisor 
+                AND careerOption = 'Entrepreneur'
+                AND department = :department
+            ");
+            $stmtStudents->bindParam(':facultyAdvisor', $facultyAdvisor);
+            $stmtStudents->bindParam(':department', $department);
             $stmtStudents->execute();
             $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 
