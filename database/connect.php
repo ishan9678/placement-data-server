@@ -6,6 +6,8 @@ $user_name = 'root';
 $user_password = '';
 
 header('Access-Control-Allow-Origin: http://localhost:3000');
+// header('Access-Control-Allow-Origin: http://192.168.29.108:3000');
+
 
 try {
     $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $user_name, $user_password);
