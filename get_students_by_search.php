@@ -15,18 +15,16 @@ if (!isset($_GET['registerNumber'])) {
 $registerNumber = $_GET['registerNumber'];
 $department = isset($_GET['department']) ? $_GET['department'] : "";
 
-
 try {
     // Fetch student details from the students table based on the register number
     if ($department === "") {
-        $stmt = $conn->prepare("SELECT registerNumber, name, section, department, specialization, batch,  careerOption, facultyAdvisorName FROM students WHERE registerNumber = ?");
+        $stmt = $conn->prepare("SELECT registerNumber, name, section, department, specialization, batch, careerOption, facultyAdvisorName FROM students WHERE registerNumber = ?");
         $stmt->execute([$registerNumber]);
-        $student = $stmt->fetch(PDO::FETCH_ASSOC);
     } else {
-        $stmt = $conn->prepare("SELECT registerNumber, name, section, department, specialization, batch,  careerOption, facultyAdvisorName FROM students WHERE registerNumber = ? AND department = '$department'");
-        $stmt->execute([$registerNumber]);
-        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $conn->prepare("SELECT registerNumber, name, section, department, specialization, batch, careerOption, facultyAdvisorName FROM students WHERE registerNumber = ? AND department = ?");
+        $stmt->execute([$registerNumber, $department]);
     }
+    $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$student) {
         echo json_encode(array('status' => 'error', 'message' => 'Student not found'));
@@ -34,19 +32,19 @@ try {
     }
 
     // Fetch placement details from the placed_students table based on the register number
-    $stmtPlacement = $conn->prepare("SELECT companyName, category, package FROM placed_students WHERE registerNumber = ?");
+    $stmtPlacement = $conn->prepare("SELECT id, companyName, category, package FROM placed_students WHERE registerNumber = ?");
     $stmtPlacement->execute([$registerNumber]);
-    $placement = $stmtPlacement->fetch(PDO::FETCH_ASSOC);
+    $placements = $stmtPlacement->fetchAll(PDO::FETCH_ASSOC);
 
-    // If there is no entry in placed_students, set placement fields to null
-    if (!$placement) {
-        $placement = array('companyName' => null, 'category' => null, 'package' => null);
+    // If there are no entries in placed_students, set placements to an empty array
+    if (!$placements) {
+        $placements = array();
     }
 
-    // Merge the student and placement details
-    $result = array_merge($student, $placement);
+    // Merge the student details and placement details
+    $result = array('student' => $student, 'placements' => $placements);
 
-    echo json_encode(array('status' => 'success', 'student' => $result));
+    echo json_encode(array('status' => 'success', 'data' => $result));
 } catch (PDOException $e) {
     echo json_encode(array('status' => 'error', 'message' => 'Error: ' . $e->getMessage()));
 }
