@@ -21,6 +21,7 @@ $stmt_fa_name = $conn->prepare($query_fa_name);
 $stmt_fa_name->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt_fa_name->execute();
 $fa_name = $stmt_fa_name->fetchColumn();
+$batch = isset($_GET['batch']) ? $_GET['batch'] : null;
 
 // Initialize variables
 $totalStudents = 0;
@@ -29,9 +30,10 @@ $higherStudies = 0;
 $entrepreneurship = 0;
 $arrears = 0;
 
-$query = 'SELECT * FROM students WHERE facultyAdvisorName = :fa_name';
+$query = 'SELECT * FROM students WHERE facultyAdvisorName = :fa_name AND batch = :batch';
 $stmt = $conn->prepare($query);
 $stmt->bindParam(':fa_name', $fa_name, PDO::PARAM_STR);
+$stmt->bindParam(':batch', $batch, PDO::PARAM_STR);
 $stmt->execute();
 
 // Fetch data from the database

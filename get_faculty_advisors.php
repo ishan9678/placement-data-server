@@ -12,12 +12,22 @@ header('Content-Type: application/json');
 if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
     $department = isset($_GET['department']) ? $_GET['department'] : "";
+    $batch = isset($_GET['batch']) ? $_GET['batch'] : "";
 
     try {
-        // Fetch faculty advisors from the database
-        $stmtAdvisors = $conn->prepare("SELECT id, name FROM users WHERE role = ? and department = '$department'");
-        $stmtAdvisors->execute(['Faculty Advisor']);
-        $facultyAdvisors = $stmtAdvisors->fetchAll(PDO::FETCH_ASSOC);
+        // fetch employee ids of faculty advisors
+        $stmtAdvisors = $conn->prepare("Select employee_id from facultyadvisor_assignments where department = ? and batch = ?");
+        $stmtAdvisors->execute([$department, $batch]);
+        $facultyAdvisorsEmployeeID = $stmtAdvisors->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch id and name from users table based on faculty advisors' employee ids
+        $facultyAdvisors = array();
+        foreach ($facultyAdvisorsEmployeeID as $advisor) {
+            $stmtUsers = $conn->prepare("SELECT id, name FROM users WHERE employee_id = ?");
+            $stmtUsers->execute([$advisor['employee_id']]);
+            $advisorData = $stmtUsers->fetch(PDO::FETCH_ASSOC);
+            $facultyAdvisors[] = $advisorData;
+        }
 
         echo json_encode(array('status' => 'success', 'facultyAdvisors' => $facultyAdvisors));
     } catch (PDOException $e) {

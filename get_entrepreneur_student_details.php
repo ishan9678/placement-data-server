@@ -28,6 +28,8 @@ if (isset($_SESSION['user_id'])) {
 
         $department = isset($_GET['department']) ? $_GET['department'] : null;
 
+        $batch = isset($_GET['batch']) ? $_GET['batch'] : null;
+
 
         if ($facultyAdvisor && $department == null) {
             // Query students where facultyAdvisorName matches and careerOption is "Higher Studies"
@@ -35,8 +37,10 @@ if (isset($_SESSION['user_id'])) {
                 SELECT * FROM students 
                 WHERE facultyAdvisorName = :facultyAdvisor 
                 AND careerOption = 'Entrepreneur'
+                AND batch = :batch
             ");
             $stmtStudents->bindParam(':facultyAdvisor', $facultyAdvisor);
+            $stmtStudents->bindParam(':batch', $batch);
             $stmtStudents->execute();
             $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 
@@ -48,9 +52,11 @@ if (isset($_SESSION['user_id'])) {
                 WHERE facultyAdvisorName = :facultyAdvisor 
                 AND careerOption = 'Entrepreneur'
                 AND department = :department
+                AND batch = :batch
             ");
             $stmtStudents->bindParam(':facultyAdvisor', $facultyAdvisor);
             $stmtStudents->bindParam(':department', $department);
+            $stmtStudents->bindParam(':batch', $batch);
             $stmtStudents->execute();
             $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 

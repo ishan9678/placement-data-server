@@ -23,10 +23,20 @@ if (isset($_SESSION['user_id'])) {
             exit;
         }
 
-        // Fetch faculty advisors with the same specialization
-        $stmtAdvisors = $conn->prepare("SELECT id, name FROM users WHERE role = ? AND (specialization = ? OR additional_specialization = ?)");
-        $stmtAdvisors->execute(['Faculty Advisor', $user['specialization'], $user['specialization']]);
-        $facultyAdvisors = $stmtAdvisors->fetchAll(PDO::FETCH_ASSOC);
+        $batch = isset($_GET['batch']) ? $_GET['batch'] : null;
+
+        // Fetch faculty advisors id with the same specialization
+        $stmtAdvisorsID = $conn->prepare("SELECT employee_id FROM facultyadvisor_assignments WHERE (specialization = ? OR additional_specialization = ?) AND batch = ?");
+        $stmtAdvisorsID->execute([$user['specialization'], $user['specialization'], $batch]);
+        $facultyAdvisorsID = $stmtAdvisorsID->fetchAll(PDO::FETCH_ASSOC);
+
+        $facultyAdvisors = array();
+        foreach ($facultyAdvisorsID as $advisor) {
+            $stmtUsers = $conn->prepare("SELECT id, name FROM users WHERE employee_id = ?");
+            $stmtUsers->execute([$advisor['employee_id']]);
+            $advisorData = $stmtUsers->fetch(PDO::FETCH_ASSOC);
+            $facultyAdvisors[] = $advisorData;
+        }
 
         echo json_encode(array('status' => 'success', 'facultyAdvisors' => $facultyAdvisors));
     } catch (PDOException $e) {

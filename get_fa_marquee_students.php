@@ -27,11 +27,15 @@ if (!$facultyAdvisor) {
 
 $facultyAdvisorName = $facultyAdvisor['facultyAdvisorName'];
 
+$batch = isset($_GET['batch']) ? $_GET['batch'] : null;
+
 // Select the marquee students for the faculty advisor
-$query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE facultyAdvisor = ? and where category = 'Marquee' ";
+$query = "SELECT registerNumber, fullName, companyName, package FROM placed_students WHERE facultyAdvisor = ? AND category = 'Marquee' AND batch = ?";
 $stmt = $conn->prepare($query);
 $stmt->bindParam(1, $facultyAdvisorName, PDO::PARAM_STR);
+$stmt->bindParam(2, $batch, PDO::PARAM_STR);
 $stmt->execute();
+
 
 if ($stmt->rowCount() > 0) {
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

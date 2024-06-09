@@ -16,7 +16,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$batch = isset($_GET['batch']) ? $_GET['batch'] : 2025;
+$batch = isset($_GET['batch']) ? $_GET['batch'] : '';
 
 // Fetch the specialization for the user from the users table
 $query_specialization = "SELECT specialization FROM users WHERE id = :user_id";

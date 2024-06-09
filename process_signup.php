@@ -39,6 +39,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmtUser->bindParam(7, $batch);
             $stmtUser->bindParam(8, $section);
             $stmtUser->bindParam(9, $password);
+
+            $stmtFacultyAdvisorAssignments = $conn->prepare("INSERT INTO facultyadvisor_assignments (employee_id, department, batch, specialization, section) VALUES (?, ?, ?, ?, ?)");
+            $stmtFacultyAdvisorAssignments->bindParam(1, $employeeId);
+            $stmtFacultyAdvisorAssignments->bindParam(2, $department);
+            $stmtFacultyAdvisorAssignments->bindParam(3, $batch);
+            $stmtFacultyAdvisorAssignments->bindParam(4, $specialization);
+            $stmtFacultyAdvisorAssignments->bindParam(5, $section);
         } else {
             $stmtUser = $conn->prepare("INSERT INTO users (name, employee_id, email_id, role, department, specialization, batch, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmtUser->bindParam(1, $name);
@@ -52,6 +59,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $stmtUser->execute();
+
+        if ($role == "Faculty Advisor") {
+            $stmtFacultyAdvisorAssignments->execute();
+        }
+
         echo json_encode(array('status' => 'success', 'message' => 'Registration successful!'));
     } catch (PDOException $e) {
         echo json_encode(array('status' => 'error', 'message' => 'Error: ' . $e->getMessage()));

@@ -13,7 +13,6 @@ if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
 
     try {
-        // Fetch the name of the user (assuming the user could be a faculty advisor)
         $stmtUser = $conn->prepare("SELECT name FROM users WHERE id = ?");
         $stmtUser->execute([$userId]);
         $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
@@ -28,14 +27,18 @@ if (isset($_SESSION['user_id'])) {
 
         $department = isset($_GET['department']) ? $_GET['department'] : null;
 
+        $batch = isset($_GET['batch']) ? $_GET['batch'] : null;
+
         if ($facultyAdvisor && $department == null) {
             // Query students where facultyAdvisorName matches and careerOption is "Higher Studies"
             $stmtStudents = $conn->prepare("
                 SELECT * FROM students 
                 WHERE facultyAdvisorName = :facultyAdvisor 
                 AND careerOption = 'Higher Studies'
+                AND batch = :batch
             ");
             $stmtStudents->bindParam(':facultyAdvisor', $facultyAdvisor);
+            $stmtStudents->bindParam(':batch', $batch);
             $stmtStudents->execute();
             $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 
@@ -47,9 +50,11 @@ if (isset($_SESSION['user_id'])) {
                 WHERE facultyAdvisorName = :facultyAdvisor 
                 AND careerOption = 'Higher Studies'
                 AND department = :department
+                AND batch = :batch
             ");
             $stmtStudents->bindParam(':facultyAdvisor', $facultyAdvisor);
             $stmtStudents->bindParam(':department', $department);
+            $stmtStudents->bindParam(':batch', $batch);
             $stmtStudents->execute();
             $students = $stmtStudents->fetchAll(PDO::FETCH_ASSOC);
 

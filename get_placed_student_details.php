@@ -33,6 +33,8 @@ if (isset($_SESSION['user_id'])) {
 
         $department = isset($_GET['department']) ? $_GET['department'] : "";
 
+        $batch = isset($_GET['batch']) ? $_GET['batch'] : "";
+
         // Construct the SQL query
         $sql = "SELECT * FROM placed_students WHERE 1";
 
@@ -51,6 +53,11 @@ if (isset($_SESSION['user_id'])) {
         if ($department !== "") {
             $sql .= " AND department = ?";
             $params[] = $department;
+        }
+
+        if ($batch !== "") {
+            $sql .= " AND batch = ?";
+            $params[] = $batch;
         }
 
         // Fetch placed students based on the constructed query

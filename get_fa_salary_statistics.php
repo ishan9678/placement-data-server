@@ -29,6 +29,8 @@ try {
         exit;
     }
 
+    $batch = isset($_GET['batch']) ? $_GET['batch'] : null;
+
     // Query to get all relevant package values for the specified batch
     $query = "
         SELECT 
@@ -39,12 +41,14 @@ try {
             facultyAdvisor = :fa_name
             AND package > 0
             AND category != 'Internship'
+            AND batch = :batch
         ORDER BY package
     ";
 
     // Prepare and execute the query
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':fa_name', $fa_name, PDO::PARAM_STR);
+    $stmt->bindParam(':batch', $batch, PDO::PARAM_STR);
     $stmt->execute();
     $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
