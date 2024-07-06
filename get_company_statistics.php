@@ -51,13 +51,16 @@ try {
         $numStudents = $row['numStudents'];
 
         if (!isset($result[$companyName])) {
-            $result[$companyName] = [
-                'category' => $category,
+            $result[$companyName] = [];
+        }
+
+        if (!isset($result[$companyName][$category])) {
+            $result[$companyName][$category] = [
                 'specializations' => array_fill_keys($specializations, '0') // Initialize all specializations with '0'
             ];
         }
 
-        $result[$companyName]['specializations'][$specialization] = $numStudents;
+        $result[$companyName][$category]['specializations'][$specialization] = $numStudents;
     }
 
     // Output the result as JSON
