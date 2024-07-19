@@ -49,6 +49,22 @@ if (count($package_values) % 2 == 0) {
     $median_package = $package_values[$mid];
 }
 
+$unique_avg_query = "
+    SELECT AVG(max_package) AS unique_avg_package
+    FROM (
+        SELECT MAX(package) AS max_package
+        FROM placed_students
+        WHERE package > 0 AND batch = :batch AND department = :department AND category != 'Internship'
+        GROUP BY registerNumber
+    ) AS max_packages;
+";
+
+$stmt = $conn->prepare($unique_avg_query);
+$stmt->bindValue(':batch', $batch);
+$stmt->bindValue(':department', $department);
+$stmt->execute();
+$unique_avg_package = (float)$stmt->fetch(PDO::FETCH_ASSOC)['unique_avg_package'];
+
 // Initialize variables for company names and names
 $max_company = '';
 $min_company = '';
@@ -84,7 +100,8 @@ $result = [
     'median_package' => $median_package,
     'median_company' => $median_company,
     'median_name' => $median_name,
-    'avg_package' => $avg_package
+    'avg_package' => $avg_package,
+    'unique_avg_package' => $unique_avg_package,
 ];
 
 // Send the result to React in JSON format
