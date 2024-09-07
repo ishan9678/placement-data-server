@@ -4,26 +4,25 @@ require_once('./database/connect.php');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-
 // Check if a file has been uploaded
 if (isset($_FILES['file'])) {
     // The path to store the uploaded file
     $target_dir = "uploads/";
     $target_file = $target_dir . basename($_FILES["file"]["name"]);
 
-
     // Move the uploaded file to the target location
     if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
         echo "The file " . htmlspecialchars(basename($_FILES["file"]["name"])) . " has been uploaded.";
 
-        // Prepare an SQL query to insert the file path into the database
-        $stmt = $conn->prepare("UPDATE placed_students SET file=:file WHERE registerNumber=:registerNumber");
+        // Prepare an SQL query to insert the file path into the database, specific to a registerNumber and companyName
+        $stmt = $conn->prepare("UPDATE placed_students SET file=:file WHERE registerNumber=:registerNumber AND companyName=:companyName");
         $stmt->bindParam(':file', $target_file);
         $stmt->bindParam(':registerNumber', $_POST['registerNumber']);
+        $stmt->bindParam(':companyName', $_POST['companyName']); // Use companyName as the identifier
 
         // Execute the query
         if ($stmt->execute()) {
-            echo "File path stored successfully";
+            echo "File path stored successfully.";
         } else {
             echo "Error: " . $stmt->errorInfo()[2];
         }

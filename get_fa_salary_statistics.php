@@ -62,14 +62,13 @@ try {
     FROM (
         SELECT MAX(package) AS max_package
         FROM placed_students
-        WHERE package > 0 AND batch = :batch AND department = :department AND category != 'Internship'
+        WHERE package > 0 AND batch = :batch AND category != 'Internship'
         GROUP BY registerNumber
     ) AS max_packages;
 ";
 
     $stmt = $conn->prepare($unique_avg_query);
     $stmt->bindValue(':batch', $batch);
-    $stmt->bindValue(':department', $department);
     $stmt->execute();
     $unique_avg_package = (float)$stmt->fetch(PDO::FETCH_ASSOC)['unique_avg_package'];
 
