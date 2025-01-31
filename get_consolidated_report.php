@@ -1,6 +1,7 @@
 <?php
 require_once('./database/connect.php');
 
+header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
@@ -17,7 +18,6 @@ try {
     $stmtFacultyAdvisorsID->execute([$batch, $department]);
     $facultyAdvisorsID = $stmtFacultyAdvisorsID->fetchAll(PDO::FETCH_ASSOC);
 
-
     // Categories to include in the report
     $categories = ['Marquee', 'Super Dream', 'Dream', 'Day Sharing', 'Internship'];
 
@@ -27,32 +27,35 @@ try {
     foreach ($facultyAdvisorsID as $advisorID) {
         $employee_id = $advisorID['employee_id'];
 
-        $stmtFacultyAdvisorName = $conn->prepare("SELECT name FROM users WHERE employee_id = ?");
+        // Fetch faculty advisor name and specialization
+        $stmtFacultyAdvisorName = $conn->prepare("SELECT name, specialization FROM users WHERE employee_id = ?");
         $stmtFacultyAdvisorName->execute([$employee_id]);
-        $facultyAdvisorName = $stmtFacultyAdvisorName->fetch(PDO::FETCH_ASSOC)['name'];
+        $facultyData = $stmtFacultyAdvisorName->fetch(PDO::FETCH_ASSOC);
+
+        $facultyAdvisorName = $facultyData['name'] ?? 'Unknown';
+        $facultyAdvisorSpecialization = $facultyData['specialization'] ?? 'Unknown';
 
         // Fetch section for the faculty advisor
         $stmtFacultyAdvisorSection = $conn->prepare("SELECT section FROM facultyadvisor_assignments WHERE employee_id = ? AND batch = ? AND department = ?");
         $stmtFacultyAdvisorSection->execute([$employee_id, $batch, $department]);
-        $facultyAdvisorSection = $stmtFacultyAdvisorSection->fetch(PDO::FETCH_ASSOC)['section'];
+        $facultyAdvisorSection = $stmtFacultyAdvisorSection->fetch(PDO::FETCH_ASSOC)['section'] ?? '';
 
         // Count for total students
         $stmtTotalCount = $conn->prepare("SELECT COUNT(*) as totalStudents FROM students WHERE facultyAdvisorName = ? AND batch = ? AND department = ?");
         $stmtTotalCount->execute([$facultyAdvisorName, $batch, $department]);
-        $totalCount = $stmtTotalCount->fetch(PDO::FETCH_ASSOC)['totalStudents'];
+        $totalCount = $stmtTotalCount->fetch(PDO::FETCH_ASSOC)['totalStudents'] ?? 0;
 
         // Count for Superset Enrolled
         $stmtSupersetCount = $conn->prepare("SELECT COUNT(*) as supersetEnrolledCount FROM students WHERE facultyAdvisorName = ? AND careerOption = 'Superset Enrolled' AND batch = ? AND department = ?");
         $stmtSupersetCount->execute([$facultyAdvisorName, $batch, $department]);
-        $supersetCount = $stmtSupersetCount->fetch(PDO::FETCH_ASSOC)['supersetEnrolledCount'];
+        $supersetCount = $stmtSupersetCount->fetch(PDO::FETCH_ASSOC)['supersetEnrolledCount'] ?? 0;
 
         // Count for each category
         $categoryCounts = [];
-
         foreach ($categories as $category) {
             $stmtCategoryCount = $conn->prepare("SELECT COUNT(*) as categoryCount FROM placed_students WHERE facultyAdvisor = ? AND category = ? AND batch = ? AND department = ?");
             $stmtCategoryCount->execute([$facultyAdvisorName, $category, $batch, $department]);
-            $categoryCounts[$category] = $stmtCategoryCount->fetch(PDO::FETCH_ASSOC)['categoryCount'];
+            $categoryCounts[$category] = $stmtCategoryCount->fetch(PDO::FETCH_ASSOC)['categoryCount'] ?? 0;
         }
 
         // Calculate total offers
@@ -61,12 +64,13 @@ try {
         // Unique count of students placed
         $stmtUniqueCount = $conn->prepare("SELECT COUNT(DISTINCT registerNumber) AS unique_registerNumber_count FROM placed_students WHERE facultyAdvisor = ? AND batch = ? AND department = ?");
         $stmtUniqueCount->execute([$facultyAdvisorName, $batch, $department]);
-        $uniqueCount = $stmtUniqueCount->fetch(PDO::FETCH_ASSOC)['unique_registerNumber_count'];
+        $uniqueCount = $stmtUniqueCount->fetch(PDO::FETCH_ASSOC)['unique_registerNumber_count'] ?? 0;
 
         // Consolidated report for this faculty advisor
         $consolidatedReport[] = [
             'facultyAdvisorName' => $facultyAdvisorName,
             'facultyAdvisorSection' => $facultyAdvisorSection,
+            'facultyAdvisorSpecialization' => $facultyAdvisorSpecialization,
             'totalCount' => $totalCount,
             'supersetEnrolledCount' => $supersetCount,
             'marquee' => $categoryCounts['Marquee'],
